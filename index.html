@@ -181,6 +181,41 @@ h3.seccion:first-child{margin-top:8px}
 #visor .vc img{max-width:100%;max-height:100%;object-fit:contain}
 #visor .vc iframe{width:100%;height:100%;border:0;background:#fff}
 
+/* Botón ✕ fijo y tirador para cerrar deslizando hacia abajo */
+.sheet-cab::before{content:"";position:absolute;left:50%;top:calc(env(safe-area-inset-top) + 2px);width:36px;height:5px;border-radius:3px;background:var(--line);transform:translateX(-50%)}
+.sheet-cab button.x,#visor .vb button.x{min-width:0;width:34px;height:34px;border-radius:50%;padding:0;text-align:center;font-size:15px;line-height:34px;font-weight:700}
+.sheet-cab button.x{background:var(--gris-soft);color:var(--text);margin:0 50px 0 4px}
+
+/* Se nota al pulsar */
+.btn,.item,.chip,.acc,.doc,.fila-tienda,.nav button,.fab,.sheet-cab button,#visor button,.menu-ops button,.menu-cancel,.swipe-acc button,.aviso-banda button,.anadir label{transition:filter .08s,transform .08s,opacity .08s}
+.btn:active,.chip:active,.acc:active,.anadir label:active,.menu-ops button:active,.menu-cancel:active,.swipe-acc button:active,.fab:active{filter:brightness(.85);transform:scale(.98)}
+.item:active,.doc:active,.fila-tienda:active{filter:brightness(.93)}
+.nav button:active,.sheet-cab button:active,#visor button:active,.aviso-banda button:active{opacity:.55}
+
+/* Deslizar una fila a la izquierda */
+.swipe{position:relative;border-radius:14px;overflow:hidden}
+.swipe .item{position:relative;z-index:1;will-change:transform}
+.swipe .item.anim{transition:transform .22s ease}
+.swipe-acc{position:absolute;top:0;right:0;bottom:0;display:flex}
+.swipe-acc button{width:76px;border:0;color:#fff;font-weight:600;font-size:15px;background:#64748b}
+.swipe-acc button.borrar{background:#dc2626}
+
+/* Arrastrar para actualizar */
+#ptr{position:absolute;left:0;right:0;text-align:center;color:var(--muted);font-size:13px;height:0;overflow:visible;z-index:4;pointer-events:none}
+#ptr span{display:inline-block;transform:translateY(18px);opacity:0;transition:opacity .15s}
+
+/* Menú al mantener pulsado */
+#menu{position:fixed;inset:0;z-index:45;display:flex;flex-direction:column;justify-content:flex-end;padding:0 10px calc(10px + env(safe-area-inset-bottom));background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .18s}
+#menu.open{opacity:1;pointer-events:auto}
+.menu-caja{max-width:520px;width:100%;margin:0 auto;transform:translateY(30px);transition:transform .2s}
+#menu.open .menu-caja{transform:none}
+.menu-ops{background:var(--card);border-radius:14px;overflow:hidden}
+.menu-tit{padding:12px 16px;font-size:13px;color:var(--muted);text-align:center;border-bottom:1px solid var(--line);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.menu-ops button{display:block;width:100%;background:none;border:0;border-bottom:1px solid var(--line);padding:15px;font-size:17px;color:var(--accent)}
+.menu-ops button:last-child{border-bottom:0}
+.menu-ops button.peligro{color:var(--mal)}
+.menu-cancel{display:block;width:100%;margin-top:8px;background:var(--card);border:0;border-radius:14px;padding:15px;font-size:17px;font-weight:600;color:var(--accent)}
+
 #toast{position:fixed;left:50%;bottom:calc(150px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);background:var(--text);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:14px;z-index:50;opacity:0;transition:.25s;pointer-events:none;max-width:90%;text-align:center}
 #toast.on{opacity:1;transform:translateX(-50%)}
 </style>
@@ -188,6 +223,7 @@ h3.seccion:first-child{margin-top:8px}
 <body>
 
 <header class="top"><div class="top-in"><h1 id="titulo">Compras</h1></div></header>
+<div id="ptr"><span>↓ Suelta para actualizar</span></div>
 <main id="main"></main>
 
 <button class="fab" id="fab" data-act="nueva" aria-label="Añadir compra"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
@@ -200,35 +236,37 @@ h3.seccion:first-child{margin-top:8px}
 </nav>
 
 <section class="sheet" id="detalle">
-  <div class="sheet-cab"><button data-act="cerrar-detalle">‹ Atrás</button><div class="t"></div><button class="der" data-act="editar">Editar</button></div>
+  <div class="sheet-cab"><button class="x" data-act="cerrar-capa" aria-label="Cerrar">✕</button><div class="t"></div><button class="der" data-act="editar">Editar</button></div>
   <div class="sheet-cuerpo" id="detalle-cuerpo"></div>
 </section>
 
 <section class="sheet" id="tienda">
-  <div class="sheet-cab"><button data-act="cancelar-tienda">Cancelar</button><div class="t"></div><button class="der" data-act="guardar-tienda">Guardar</button></div>
+  <div class="sheet-cab"><button class="x" data-act="cerrar-capa" aria-label="Cerrar">✕</button><div class="t"></div><button class="der" data-act="guardar-tienda">Guardar</button></div>
   <div class="sheet-cuerpo" id="tienda-cuerpo"></div>
 </section>
 
 <section class="sheet" id="reclamar">
-  <div class="sheet-cab"><button data-act="cerrar-reclamar">‹ Atrás</button><div class="t">Reclamar</div><button class="der" style="visibility:hidden">·</button></div>
+  <div class="sheet-cab"><button class="x" data-act="cerrar-capa" aria-label="Cerrar">✕</button><div class="t">Reclamar</div><button class="der" style="visibility:hidden">·</button></div>
   <div class="sheet-cuerpo" id="reclamar-cuerpo"></div>
 </section>
 
 <section class="sheet" id="form">
-  <div class="sheet-cab"><button data-act="cancelar-form">Cancelar</button><div class="t" id="form-titulo"></div><button class="der" data-act="guardar-form">Guardar</button></div>
+  <div class="sheet-cab"><button class="x" data-act="cerrar-capa" aria-label="Cerrar">✕</button><div class="t" id="form-titulo"></div><button class="der" data-act="guardar-form">Guardar</button></div>
   <div class="sheet-cuerpo" id="form-cuerpo"></div>
 </section>
 
 <div id="visor">
-  <div class="vb"><button data-act="cerrar-visor">Cerrar</button><button data-act="compartir-visor">Guardar / Compartir</button></div>
+  <div class="vb"><button class="x" data-act="cerrar-capa" aria-label="Cerrar">✕</button><button data-act="compartir-visor">Guardar / Compartir</button></div>
   <div class="vc" id="visor-c"></div>
 </div>
+
+<div id="menu"><div class="menu-caja"><div class="menu-ops" id="menu-ops"></div><button class="menu-cancel" data-act="menu-cerrar">Cancelar</button></div></div>
 
 <div id="toast"></div>
 
 <script>
 'use strict';
-const VERSION = '1.1.0';
+const VERSION = '1.2.0';
 const DIA = 86400000;
 
 /* ---------------- Utilidades ---------------- */
@@ -413,11 +451,13 @@ function itemHTML(c, modo) {
   if (modo === 'devolucion') bs = d ? badge(d) : '';
   else { if (d) bs += badge(d); bs += badge(g); }
   const sub = [c.tienda, fCorta(c.fecha)].filter(Boolean).join(' · ') + (nf ? ' · ' + plural(nf, 'factura', 'facturas') : '');
-  return `<button class="item" data-act="ver-compra" data-id="${c.id}">
+  return `<div class="swipe" data-id="${c.id}">
+   <div class="swipe-acc"><button data-act="menu-editar" data-id="${c.id}">Editar</button><button class="borrar" data-act="fila-borrar" data-id="${c.id}">Borrar</button></div>
+   <button class="item" data-act="ver-compra" data-id="${c.id}" data-menu="compra">
     <div class="thumb">${foto ? `<img src="${url(foto, true)}" alt="" loading="lazy">` : IC.bolsa}</div>
     <div class="info"><div class="nombre">${esc(c.nombre)}</div><div class="sub">${esc(sub)}</div><div class="badges">${bs}</div></div>
     <div class="precio">${euro(c.precio)}</div>
-  </button>`;
+  </button></div>`;
 }
 
 function pintarResultados() {
@@ -545,7 +585,7 @@ function docHTML(a, conQuitar) {
   const esImg = (a.mime || '').startsWith('image/');
   const partes = (a.nombre || '').split('.');
   const ext = /pdf/.test(a.mime || '') ? 'PDF' : (partes.length > 1 ? partes.pop().slice(0, 4).toUpperCase() : 'DOC');
-  return `<div class="doc" data-act="ver" data-aid="${a.id}" role="button">
+  return `<div class="doc" data-act="ver" data-aid="${a.id}" data-menu="${conQuitar ? '' : 'archivo'}" role="button">
     <div class="di">${esImg ? `<img src="${url(a, true)}" alt="">` : esc(ext)}</div>
     <div class="dn"><div>${esc(a.nombre || 'Documento')}</div><div>${tamano(a.blob ? a.blob.size : 0)}</div></div>
     ${conQuitar ? `<button class="quitar" data-act="quitar-archivo" data-aid="${a.id}" aria-label="Quitar">✕</button>` : ''}
@@ -721,7 +761,7 @@ function abrirForm(id) {
     id: uid(), nombre: '', tienda: '', categoria: '', fecha: f, precio: '', pedido: '', pago: '', enlace: '', notas: '',
     garantiaMeses: 36, garantiaHasta: masMeses(f, 36), devolucionDias: null, devolucionHasta: '', creado: Date.now()
   };
-  F = { c, nuevo: !base, nuevos: [], quitar: new Set() };
+  F = { c, nuevo: !base, nuevos: [], quitar: new Set(), orig: JSON.stringify(c) };
   $('#form-titulo').textContent = base ? 'Editar compra' : 'Nueva compra';
   pintarForm();
   $('#form').scrollTop = 0;
@@ -884,18 +924,19 @@ async function guardarForm() {
   programarAvisos();
 }
 
-async function borrarCompra() {
-  const c = S.compras.find((x) => x.id === S.detalle); if (!c) return;
+async function borrarCompra(id) {
+  const c = S.compras.find((x) => x.id === (id || S.detalle)); if (!c) return false;
   const as = archivosDe(c.id);
-  if (!confirm(`¿Eliminar «${c.nombre}»${as.length ? ' con sus ' + plural(as.length, 'archivo', 'archivos') : ''}? No se puede deshacer.`)) return;
+  if (!confirm(`¿Eliminar «${c.nombre}»${as.length ? ' con sus ' + plural(as.length, 'archivo', 'archivos') : ''}? No se puede deshacer.`)) return false;
   await escribir('compras', [], [c.id]);
   await escribir('archivos', [], as.map((a) => a.id));
   as.forEach((a) => revocar(a.id));
   S.compras = S.compras.filter((x) => x.id !== c.id);
   S.archivos = S.archivos.filter((a) => a.compraId !== c.id);
-  cerrarSheet('detalle');
+  if (S.detalle === c.id) { cerrarSheet('detalle'); S.detalle = null; }
   toast('Compra eliminada');
   pintar();
+  return true;
 }
 
 /* ---------------- Visor de fotos y facturas ---------------- */
@@ -1015,8 +1056,12 @@ document.addEventListener('click', async (e) => {
   if (tabBtn) { S.tab = tabBtn.dataset.tab; $('#main').scrollTop = 0; pintar(); return; }
   const ir = e.target.closest('[data-tab-ir]');
   if (ir) { S.tab = ir.dataset.tabIr; $('#main').scrollTop = 0; pintar(); return; }
+  if (Date.now() < ignorarClicHasta) { e.preventDefault(); e.stopPropagation(); return; }
   const el = e.target.closest('[data-act]'); if (!el) return;
   const act = el.dataset.act;
+  // Si hay una fila abierta, el primer toque solo la cierra
+  if (filaAbierta && !el.closest('.swipe-acc')) { cerrarFila(); if (el.closest('.swipe')) return; }
+  if (act.startsWith('menu-') || act === 'fila-borrar') cerrarMenu();
   if (act === 'quitar-archivo') { e.stopPropagation(); quitarArchivo(el.dataset.aid); return; }
   switch (act) {
     case 'nueva': abrirForm(null); break;
@@ -1024,6 +1069,14 @@ document.addEventListener('click', async (e) => {
     case 'cerrar-detalle': cerrarSheet('detalle'); S.detalle = null; break;
     case 'editar': abrirForm(S.detalle); break;
     case 'borrar-compra': borrarCompra(); break;
+    case 'cerrar-capa': cerrarCapa(capaSuperior()); break;
+    case 'menu-cerrar': break;
+    case 'fila-borrar': { cerrarFila(); borrarCompra(el.dataset.id); break; }
+    case 'menu-ver': S.detalle = el.dataset.id; pintarDetalle(); $('#detalle').scrollTop = 0; abrirSheet('detalle'); break;
+    case 'menu-editar': cerrarFila(); abrirForm(el.dataset.id); break;
+    case 'menu-reclamar': S.detalle = el.dataset.id; pintarDetalle(); abrirSheet('detalle'); abrirReclamar(); break;
+    case 'menu-ver-archivo': verArchivo(el.dataset.aid); break;
+    case 'menu-compartir-archivo': { const a = buscarArchivo(el.dataset.aid); if (a) compartir(a.blob, a.nombre || 'archivo'); break; }
     case 'cancelar-form': cerrarForm(); break;
     case 'editar-tienda': abrirTienda(el.dataset.t); break;
     case 'cancelar-tienda': T = null; cerrarSheet('tienda'); break;
@@ -1092,6 +1145,151 @@ document.addEventListener('change', (e) => {
   if (t.closest('#form') && t.dataset.k === 'fecha') cambioCampo(e);
 });
 
+/* ---------------- Capas (ventanas por encima) ---------------- */
+function capaSuperior() {
+  if ($('#visor').classList.contains('open')) return 'visor';
+  let mejor = null, z = -1;
+  for (const id of ['detalle', 'form', 'tienda', 'reclamar']) {
+    const el = $('#' + id);
+    if (el.classList.contains('open')) { const zi = Number(getComputedStyle(el).zIndex) || 0; if (zi > z) { z = zi; mejor = id; } }
+  }
+  return mejor;
+}
+function formCambiado() { return !!F && (F.nuevos.length > 0 || F.quitar.size > 0 || JSON.stringify(F.c) !== F.orig); }
+// Cierra la capa de arriba. Devuelve false si el usuario decide no cerrarla.
+function cerrarCapa(id, animar) {
+  if (!id) return false;
+  if (id === 'form' && formCambiado() && !confirm('¿Salir sin guardar los cambios?')) return false;
+  const hecho = () => {
+    if (id === 'visor') cerrarVisor();
+    else if (id === 'form') cerrarForm();
+    else if (id === 'tienda') { T = null; cerrarSheet('tienda'); }
+    else if (id === 'reclamar') { R = null; cerrarSheet('reclamar'); }
+    else if (id === 'detalle') { cerrarSheet('detalle'); S.detalle = null; }
+  };
+  const el = $('#' + id);
+  if (!animar) { hecho(); return true; }
+  el.style.transition = 'transform .2s ease';
+  el.style.transform = animar === 'x' ? 'translateX(100%)' : 'translateY(100%)';
+  setTimeout(() => { el.style.transition = 'none'; hecho(); setTimeout(() => { el.style.transform = ''; setTimeout(() => { el.style.transition = ''; }, 50); }, 30); }, 200);
+  return true;
+}
+function volverCapa(el) { el.style.transition = 'transform .2s ease'; el.style.transform = ''; setTimeout(() => { el.style.transition = ''; }, 220); }
+
+/* ---------------- Menú al mantener pulsado ---------------- */
+function abrirMenu(el) {
+  const tipo = el.dataset.menu; let titulo = '', ops = [];
+  if (tipo === 'compra') {
+    const c = S.compras.find((x) => x.id === el.dataset.id); if (!c) return;
+    titulo = c.nombre;
+    ops = [['Ver', 'menu-ver'], ['Editar', 'menu-editar'], ['Reclamar garantía o devolver', 'menu-reclamar'], ['Borrar', 'fila-borrar', true]].map(([t, a, p]) => `<button data-act="${a}" data-id="${c.id}" class="${p ? 'peligro' : ''}">${t}</button>`);
+  } else if (tipo === 'archivo') {
+    const a = buscarArchivo(el.dataset.aid); if (!a) return;
+    titulo = a.nombre || 'Archivo';
+    ops = [['Ver', 'menu-ver-archivo'], ['Guardar / Compartir', 'menu-compartir-archivo']].map(([t, ac]) => `<button data-act="${ac}" data-aid="${a.id}">${t}</button>`);
+  } else return;
+  $('#menu-ops').innerHTML = `<div class="menu-tit">${esc(titulo)}</div>` + ops.join('');
+  $('#menu').classList.add('open');
+}
+function cerrarMenu() { $('#menu').classList.remove('open'); }
+$('#menu').addEventListener('click', (e) => { if (e.target.id === 'menu') cerrarMenu(); });
+document.addEventListener('contextmenu', (e) => { const m = e.target.closest('[data-menu]'); if (m && m.dataset.menu) { e.preventDefault(); abrirMenu(m); } });
+
+/* ---------------- Filas que se deslizan ---------------- */
+let filaAbierta = null;
+const ANCHO_ACC = 152;
+function moverFila(item, x, anim) { item.classList.toggle('anim', !!anim); item.style.transform = x ? `translateX(${x}px)` : ''; }
+function cerrarFila() { if (filaAbierta) { moverFila(filaAbierta, 0, true); filaAbierta = null; } }
+
+/* ---------------- Gestos táctiles ---------------- */
+let G = null, ignorarClicHasta = 0, swReg = null;
+document.addEventListener('touchstart', (e) => {
+  if (e.touches.length !== 1) { if (G) clearTimeout(G.lp); G = null; return; }
+  const t = e.touches[0];
+  const capa = capaSuperior();
+  const menuAbierto = $('#menu').classList.contains('open');
+  G = { x0: t.clientX, y0: t.clientY, x: t.clientX, y: t.clientY, t0: Date.now(), modo: null, capa, target: e.target };
+  if (menuAbierto) { G.modo = 'nada'; return; }
+  G.el = capa ? $('#' + capa) : null;
+  G.item = !capa ? e.target.closest('.swipe .item') : null;
+  if (filaAbierta && !e.target.closest('.swipe-acc') && G.item !== filaAbierta) { cerrarFila(); G.modo = 'nada'; ignorarClicHasta = Date.now() + 400; return; }
+  const m = e.target.closest('[data-menu]');
+  if (m && m.dataset.menu) G.lp = setTimeout(() => { if (G && !G.modo) { G.modo = 'menu'; abrirMenu(m); } }, 500);
+}, { passive: true });
+
+document.addEventListener('touchmove', (e) => {
+  if (!G || e.touches.length !== 1) return;
+  const t = e.touches[0];
+  G.x = t.clientX; G.y = t.clientY;
+  const dx = G.x - G.x0, dy = G.y - G.y0;
+  if (!G.modo) {
+    if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+    clearTimeout(G.lp);
+    const horiz = Math.abs(dx) > Math.abs(dy);
+    const scroller = G.capa === 'visor' ? null : G.el;
+    if (G.capa && G.x0 < 28 && dx > 0 && horiz) G.modo = 'atras';
+    else if (G.capa && dy > 0 && !horiz && (!scroller || scroller.scrollTop <= 0) && !G.target.closest('textarea, .galeria')) G.modo = 'bajar';
+    else if (!G.capa && G.item && horiz) { G.modo = 'fila'; G.base = filaAbierta === G.item ? -ANCHO_ACC : 0; }
+    else if (!G.capa && S.tab === 'lista' && dy > 0 && !horiz && $('#main').scrollTop <= 0 && G.target.closest('#main')) G.modo = 'refrescar';
+    else G.modo = 'nada';
+    if (G.modo === 'atras' || G.modo === 'bajar') G.el.style.transition = 'none';
+  }
+  if (G.modo === 'atras') { e.preventDefault(); G.el.style.transform = `translateX(${Math.max(0, dx)}px)`; }
+  else if (G.modo === 'bajar') { e.preventDefault(); G.el.style.transform = `translateY(${Math.max(0, dy)}px)`; }
+  else if (G.modo === 'fila') {
+    e.preventDefault();
+    let x = G.base + dx;
+    if (x > 0) x = 0;
+    if (x < -ANCHO_ACC) x = -ANCHO_ACC + (x + ANCHO_ACC) * 0.3;
+    moverFila(G.item, x);
+  } else if (G.modo === 'refrescar') {
+    e.preventDefault();
+    const d = Math.min(90, dy * 0.5);
+    const m = $('#main'); m.style.transition = 'none'; m.style.transform = `translateY(${d}px)`;
+    const sp = $('#ptr span'); sp.style.opacity = d > 10 ? 1 : 0;
+    sp.textContent = d >= 60 ? '↻ Suelta para actualizar' : '↓ Arrastra para actualizar';
+    G.d = d;
+  }
+}, { passive: false });
+
+async function refrescar() {
+  const sp = $('#ptr span'); sp.textContent = 'Actualizando…'; sp.style.opacity = 1;
+  try {
+    await cargar(); pintar(); programarAvisos();
+    if (swReg) swReg.update().catch(() => {});
+  } catch (e) {}
+  setTimeout(() => {
+    const m = $('#main'); m.style.transition = 'transform .2s ease'; m.style.transform = '';
+    sp.style.opacity = 0; toast('Actualizado');
+  }, 350);
+}
+
+function finToque(e) {
+  if (!G) return;
+  clearTimeout(G.lp);
+  const g = G; G = null;
+  const dx = g.x - g.x0, dy = g.y - g.y0, rapido = Date.now() - g.t0 < 250;
+  if (g.modo === 'menu') { ignorarClicHasta = Date.now() + 450; if (e.cancelable) e.preventDefault(); return; }
+  if (g.modo === 'atras' || g.modo === 'bajar') {
+    const d = g.modo === 'atras' ? dx : dy;
+    const lim = g.modo === 'atras' ? innerWidth * 0.3 : 110;
+    if ((d > lim || (rapido && d > 50)) && cerrarCapa(g.capa, g.modo === 'atras' ? 'x' : 'y')) {}
+    else volverCapa(g.el);
+    ignorarClicHasta = Date.now() + 350;
+  } else if (g.modo === 'fila') {
+    const x = g.base + dx;
+    const abrir = x < -ANCHO_ACC / 2 || (rapido && dx < -30);
+    if (abrir) { if (filaAbierta && filaAbierta !== g.item) cerrarFila(); moverFila(g.item, -ANCHO_ACC, true); filaAbierta = g.item; }
+    else { moverFila(g.item, 0, true); if (filaAbierta === g.item) filaAbierta = null; }
+    ignorarClicHasta = Date.now() + 350;
+  } else if (g.modo === 'refrescar') {
+    if ((g.d || 0) >= 60) refrescar();
+    else { const m = $('#main'); m.style.transition = 'transform .2s ease'; m.style.transform = ''; $('#ptr span').style.opacity = 0; }
+  }
+}
+document.addEventListener('touchend', finToque, { passive: false });
+document.addEventListener('touchcancel', finToque, { passive: false });
+
 /* ---------------- Arranque ---------------- */
 // Sin zoom con dos dedos (iOS ignora user-scalable en algunos casos).
 ['gesturestart', 'gesturechange'].forEach((ev) => document.addEventListener(ev, (e) => e.preventDefault(), { passive: false }));
@@ -1107,6 +1305,7 @@ async function cargar() {
   programarAvisos();
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     navigator.serviceWorker.register('sw.js').then((reg) => {
+      swReg = reg;
       document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { reg.update().catch(() => {}); programarAvisos(); } });
     }).catch(() => {});
   }
