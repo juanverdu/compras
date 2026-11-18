@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -33,19 +33,22 @@
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 [hidden]{display:none!important}
-html,body{margin:0;background:var(--bg);color:var(--text);font:16px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;-webkit-text-size-adjust:100%}
-body{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+/* Pantalla fija como una app: sin zoom, sin rebote, solo se desplaza el contenido */
+html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;touch-action:pan-x pan-y;background:var(--bg);color:var(--text);font:16px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;-webkit-text-size-adjust:100%}
+body{position:fixed;inset:0;display:flex;flex-direction:column;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+input,textarea,select{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
 button,input,select,textarea{font:inherit;color:inherit}
-button{cursor:pointer}
+input,select,textarea{font-size:16px}
+button{cursor:pointer;touch-action:manipulation}
 a{color:var(--accent)}
 
-.top{position:sticky;top:0;z-index:5;background:var(--bg);padding:calc(env(safe-area-inset-top) + 8px) 16px 6px}
+.top{flex:none;z-index:5;background:var(--bg);padding:calc(env(safe-area-inset-top) + 8px) 16px 6px}
 .top h1{font-size:32px;margin:6px 0 4px;letter-spacing:-.02em}
-main{padding:0 16px 24px;max-width:720px;margin:0 auto}
+main{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:0 max(16px,calc((100% - 688px)/2)) 96px}
 .top-in{max-width:720px;margin:0 auto}
 
 /* Navegación */
-.nav{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;background:color-mix(in srgb,var(--card) 92%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
+.nav{flex:none;position:relative;z-index:10;display:flex;background:color-mix(in srgb,var(--card) 92%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
 .nav button{flex:1;background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;color:var(--muted);padding:4px 0}
 .nav button.on{color:var(--accent);font-weight:600}
 .nav svg,.ico{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
@@ -57,7 +60,7 @@ main{padding:0 16px 24px;max-width:720px;margin:0 auto}
 .buscar input{width:100%;border:0;border-radius:12px;background:var(--gris-soft);padding:10px 12px 10px 38px;font-size:16px;outline:none}
 .buscar svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--muted)}
 .filtros{display:flex;gap:8px;margin-bottom:10px}
-.filtros select{flex:1;min-width:0;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:8px 10px;font-size:15px;-webkit-appearance:none;appearance:none}
+.filtros select{flex:1;min-width:0;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:8px 10px;font-size:16px;-webkit-appearance:none;appearance:none}
 .recuento{display:flex;justify-content:space-between;align-items:baseline;color:var(--muted);font-size:14px;margin:4px 2px 8px}
 .recuento b{color:var(--text);font-size:15px}
 
@@ -109,9 +112,18 @@ h3.seccion:first-child{margin-top:8px}
 .version{text-align:center;color:var(--muted);font-size:13px;margin:24px 0 8px}
 
 /* Hojas (pantallas superpuestas) */
-.sheet{position:fixed;inset:0;z-index:20;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;transform:translateY(100%);transition:transform .28s ease;visibility:hidden}
+.sheet{position:fixed;inset:0;z-index:20;background:var(--bg);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;transform:translateY(100%);transition:transform .28s ease;visibility:hidden}
 .sheet.open{transform:none;visibility:visible}
 #form{z-index:25}
+#tienda,#reclamar{z-index:26}
+.ahorro{font-size:14px;color:var(--ok);font-weight:600;margin-top:2px}
+.ahorro s{color:var(--muted);font-weight:400}
+.acciones{display:flex;flex-wrap:wrap;gap:8px}
+.acc{flex:1 1 40%;text-align:center;text-decoration:none;background:var(--accent-soft);color:var(--accent);border-radius:10px;padding:10px 8px;font-weight:600;font-size:15px}
+.fila-tienda{display:flex;align-items:center;gap:10px;width:100%;background:none;border:0;border-bottom:1px solid var(--line);padding:12px 0;text-align:left;font-size:16px}
+.fila-tienda:last-child{border-bottom:0}
+.fila-tienda span:first-child{flex:1}
+.fila-tienda .n{font-size:13px;color:var(--muted)}
 .sheet-cab{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--bg);padding:calc(env(safe-area-inset-top) + 8px) 8px 8px;border-bottom:1px solid var(--line)}
 .sheet-cab .t{font-weight:600;flex:1;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sheet-cab button{background:none;border:0;color:var(--accent);font-size:17px;padding:6px 8px;min-width:84px;text-align:left}
@@ -192,6 +204,16 @@ h3.seccion:first-child{margin-top:8px}
   <div class="sheet-cuerpo" id="detalle-cuerpo"></div>
 </section>
 
+<section class="sheet" id="tienda">
+  <div class="sheet-cab"><button data-act="cancelar-tienda">Cancelar</button><div class="t"></div><button class="der" data-act="guardar-tienda">Guardar</button></div>
+  <div class="sheet-cuerpo" id="tienda-cuerpo"></div>
+</section>
+
+<section class="sheet" id="reclamar">
+  <div class="sheet-cab"><button data-act="cerrar-reclamar">‹ Atrás</button><div class="t">Reclamar</div><button class="der" style="visibility:hidden">·</button></div>
+  <div class="sheet-cuerpo" id="reclamar-cuerpo"></div>
+</section>
+
 <section class="sheet" id="form">
   <div class="sheet-cab"><button data-act="cancelar-form">Cancelar</button><div class="t" id="form-titulo"></div><button class="der" data-act="guardar-form">Guardar</button></div>
   <div class="sheet-cuerpo" id="form-cuerpo"></div>
@@ -206,7 +228,7 @@ h3.seccion:first-child{margin-top:8px}
 
 <script>
 'use strict';
-const VERSION = '1.0.0';
+const VERSION = '1.1.0';
 const DIA = 86400000;
 
 /* ---------------- Utilidades ---------------- */
@@ -255,9 +277,10 @@ const ls = {
 let dbp;
 function abrirDB() {
   if (!dbp) dbp = new Promise((res, rej) => {
-    const r = indexedDB.open('compras-app', 1);
+    const r = indexedDB.open('compras-app', 2);
     r.onupgradeneeded = () => {
       const d = r.result;
+      if (!d.objectStoreNames.contains('tiendas')) d.createObjectStore('tiendas', { keyPath: 'nombre' });
       if (!d.objectStoreNames.contains('compras')) d.createObjectStore('compras', { keyPath: 'id' });
       if (!d.objectStoreNames.contains('archivos')) d.createObjectStore('archivos', { keyPath: 'id' }).createIndex('compraId', 'compraId');
     };
@@ -281,7 +304,7 @@ async function escribir(store, poner = [], quitar = []) {
 }
 
 /* ---------------- Estado ---------------- */
-const S = { compras: [], archivos: [], tab: 'lista', q: '', tienda: '', orden: ls.get('orden', 'fecha-desc'), detalle: null, urls: new Map(), copia: null };
+const S = { compras: [], archivos: [], tiendasInfo: [], tab: 'lista', q: '', tienda: '', orden: ls.get('orden', 'fecha-desc'), detalle: null, urls: new Map(), copia: null };
 let F = null; // borrador del formulario
 
 function url(a, mini) {
@@ -295,13 +318,19 @@ const buscarArchivo = (id) => S.archivos.find((a) => a.id === id) || (F && F.nue
 const tiendas = () => [...new Set(S.compras.map((c) => c.tienda).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'es'));
 const categorias = () => [...new Set(S.compras.map((c) => c.categoria).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'es'));
 
+const infoTienda = (nombre) => S.tiendasInfo.find((t) => t.nombre === nombre) || null;
+// Fecha final de garantía: la más tardía entre la legal y la ampliada.
+function finGarantia(c) { const a = c.garantiaHasta || '', b = c.ampliadaHasta || ''; return a > b ? a : b; }
 function estadoG(c) {
-  if (!c.garantiaHasta) return { k: '', t: 'Sin garantía' };
-  const n = dias(c.garantiaHasta);
+  const fin = finGarantia(c);
+  if (!fin) return { k: '', t: 'Sin garantía' };
+  const amp = !!c.ampliadaHasta && fin === c.ampliadaHasta && (!c.garantiaHasta || dias(c.garantiaHasta) < 0);
+  const p = amp ? 'Garantía ampliada' : 'Garantía';
+  const n = dias(fin);
   if (n < 0) return { k: 'mal', t: 'Garantía caducada' };
-  if (n === 0) return { k: 'aviso', t: 'Garantía: acaba hoy' };
-  if (n <= 60) return { k: 'aviso', t: 'Garantía: ' + plural(n, 'día', 'días') };
-  return { k: 'ok', t: 'Garantía hasta ' + fCorta(c.garantiaHasta) };
+  if (n === 0) return { k: 'aviso', t: p + ': acaba hoy' };
+  if (n <= 60) return { k: 'aviso', t: p + ': ' + plural(n, 'día', 'días') };
+  return { k: 'ok', t: p + ' hasta ' + fCorta(fin) };
 }
 function estadoD(c) {
   if (!c.devolucionHasta) return null;
@@ -363,14 +392,14 @@ function vistaLista() {
 function filtradas() {
   const q = norm(S.q);
   const l = S.compras.filter((c) => (!S.tienda || c.tienda === S.tienda) &&
-    (!q || norm([c.nombre, c.tienda, c.categoria, c.pedido, c.notas, c.pago].join(' ')).includes(q)));
+    (!q || norm([c.nombre, c.tienda, c.categoria, c.pedido, c.notas, c.pago, c.serie].join(' ')).includes(q)));
   const o = S.orden;
   l.sort((a, b) => {
     if (o === 'fecha-asc') return (a.fecha || '').localeCompare(b.fecha || '') || a.creado - b.creado;
     if (o === 'precio-desc') return (b.precio || 0) - (a.precio || 0);
     if (o === 'precio-asc') return (a.precio || 0) - (b.precio || 0);
     if (o === 'nombre') return a.nombre.localeCompare(b.nombre, 'es');
-    if (o === 'garantia') return (a.garantiaHasta || '9999').localeCompare(b.garantiaHasta || '9999');
+    if (o === 'garantia') return (finGarantia(a) || '9999').localeCompare(finGarantia(b) || '9999');
     return (b.fecha || '').localeCompare(a.fecha || '') || b.creado - a.creado;
   });
   return l;
@@ -400,12 +429,12 @@ function pintarResultados() {
 }
 
 function vistaGarantias() {
-  const conG = S.compras.filter((c) => c.garantiaHasta).sort((a, b) => a.garantiaHasta.localeCompare(b.garantiaHasta));
+  const conG = S.compras.filter((c) => finGarantia(c)).sort((a, b) => finGarantia(a).localeCompare(finGarantia(b)));
   const devol = S.compras.filter((c) => estadoD(c)).sort((a, b) => a.devolucionHasta.localeCompare(b.devolucionHasta));
-  const pronto = conG.filter((c) => { const n = dias(c.garantiaHasta); return n >= 0 && n <= 60; });
-  const vigor = conG.filter((c) => dias(c.garantiaHasta) > 60);
-  const cad = conG.filter((c) => dias(c.garantiaHasta) < 0).reverse();
-  const sin = S.compras.filter((c) => !c.garantiaHasta);
+  const pronto = conG.filter((c) => { const n = dias(finGarantia(c)); return n >= 0 && n <= 60; });
+  const vigor = conG.filter((c) => dias(finGarantia(c)) > 60);
+  const cad = conG.filter((c) => dias(finGarantia(c)) < 0).reverse();
+  const sin = S.compras.filter((c) => !finGarantia(c));
   if (!S.compras.length) return `<div class="vacio">${IC.escudo}<p>Cuando añadas compras con fecha de garantía, aquí verás cuáles siguen cubiertas y cuáles caducan pronto.</p></div>`;
   const sec = (t, l, modo) => l.length ? `<h3 class="seccion">${t} (${l.length})</h3><div class="lista">${l.map((c) => itemHTML(c, modo)).join('')}</div>` : '';
   return sec('Plazo de devolución abierto', devol, 'devolucion') +
@@ -430,7 +459,8 @@ function vistaResumen() {
   const anio = String(new Date().getFullYear());
   const deEste = S.compras.filter((c) => (c.fecha || '').startsWith(anio));
   const totalAnio = deEste.reduce((s, c) => s + (Number(c.precio) || 0), 0);
-  const enG = S.compras.filter((c) => c.garantiaHasta && dias(c.garantiaHasta) >= 0).length;
+  const enG = S.compras.filter((c) => finGarantia(c) && dias(finGarantia(c)) >= 0).length;
+  const ahorro = S.compras.reduce((s, c) => s + Math.max(0, (Number(c.precioOriginal) || 0) - (Number(c.precio) || 0)), 0);
   const porTienda = agrupar((c) => c.tienda).sort((a, b) => b.total - a.total);
   const porAnio = agrupar((c) => (c.fecha || '').slice(0, 4)).sort((a, b) => b.k.localeCompare(a.k));
   const porCat = agrupar((c) => c.categoria).sort((a, b) => b.total - a.total);
@@ -439,6 +469,7 @@ function vistaResumen() {
     <div class="kpi"><div class="v">${S.compras.length}</div><div class="l">Compras</div></div>
     <div class="kpi"><div class="v">${euro(totalAnio)}</div><div class="l">En ${anio} · ${plural(deEste.length, 'compra', 'compras')}</div></div>
     <div class="kpi"><div class="v">${enG}</div><div class="l">En garantía ahora</div></div>
+    ${ahorro > 0 ? `<div class="kpi" style="grid-column:1/-1"><div class="v" style="color:var(--ok)">${euro(ahorro)}</div><div class="l">Ahorrado con descuentos (frente al precio original)</div></div>` : ''}
   </div>
   <h3 class="seccion">Por tienda</h3><div class="tarjeta">${barras(porTienda)}</div>
   <h3 class="seccion">Por año</h3><div class="tarjeta">${barras(porAnio)}</div>
@@ -458,6 +489,19 @@ function vistaAjustes() {
     ${copiaBtn}
     <label class="btn sec">Importar copia<input type="file" id="importar" accept="application/json,.json" hidden></label>
     <div class="nota">Al importar, las compras de la copia se añaden a las que ya tienes; si alguna ya existe, se actualiza.</div>
+  </div>
+
+  <h3 class="seccion">Tiendas</h3>
+  <div class="tarjeta" style="padding:2px 14px">
+    ${(() => {
+      const ns = [...new Set(tiendas().concat(S.tiendasInfo.map((t) => t.nombre)))].sort((a, b) => a.localeCompare(b, 'es'));
+      if (!ns.length) return '<p style="margin:12px 0">Cuando añadas compras, aquí podrás guardar la web, el teléfono y el correo de cada tienda.</p>';
+      return ns.map((n) => {
+        const k = S.compras.filter((c) => c.tienda === n).length, i = infoTienda(n);
+        const tiene = i && (i.web || i.devoluciones || i.telefono || i.email || i.cuenta || i.notas);
+        return `<button class="fila-tienda" data-act="editar-tienda" data-t="${esc(n)}"><span>${esc(n)}<br><span class="n">${plural(k, 'compra', 'compras')}${tiene ? ' · con datos de contacto' : ''}</span></span><span class="n">${tiene ? 'Editar' : 'Añadir datos'} ›</span></button>`;
+      }).join('');
+    })()}
   </div>
 
   <h3 class="seccion">Avisos en el móvil (ntfy)</h3>
@@ -517,22 +561,156 @@ function pintarDetalle() {
   $('#detalle .t').textContent = '';
   $('#detalle-cuerpo').innerHTML = `
     ${fotos.length ? `<div class="galeria">${fotos.map((f) => `<img src="${url(f)}" data-act="ver" data-aid="${f.id}" alt="">`).join('')}</div>` : ''}
-    <div class="det-cab"><h2>${esc(c.nombre)}</h2><div class="det-precio">${euro(c.precio)}</div><div class="badges">${d ? badge(d) : ''}${badge(g)}</div></div>
+    <div class="det-cab"><h2>${esc(c.nombre)}</h2><div class="det-precio">${euro(c.precio)}</div>${ahorroHTML(c)}<div class="badges">${d ? badge(d) : ''}${badge(g)}</div></div>
     <div class="etiqueta">Compra</div>
     <div class="tarjeta filas">
       ${fila('Tienda', c.tienda)}
       ${fila('Fecha', fLarga(c.fecha))}
       ${fila('Categoría', c.categoria)}
       ${fila('Nº de pedido', c.pedido)}
+      ${fila('Nº de serie / IMEI', c.serie)}
       ${fila('Forma de pago', c.pago)}
       ${enlace ? fila('Enlace', '', `<a href="${esc(enlace)}" target="_blank" rel="noopener">Abrir</a>`) : ''}
       ${fila('Devolución hasta', c.devolucionHasta ? fLarga(c.devolucionHasta) : '')}
-      ${fila('Garantía hasta', c.garantiaHasta ? fLarga(c.garantiaHasta) : 'Sin garantía')}
+      ${fila('Garantía legal hasta', c.garantiaHasta ? fLarga(c.garantiaHasta) : 'Sin garantía')}
+      ${c.ampliadaHasta ? fila('Garantía ampliada hasta', fLarga(c.ampliadaHasta) + (c.ampliadaQuien ? ' (' + c.ampliadaQuien + ')' : '')) : ''}
     </div>
+    <button class="btn" data-act="reclamar">${IC.escudo} Reclamar garantía o devolver</button>
+    ${c.tienda ? tiendaHTML(c.tienda) : ''}
     ${c.notas ? `<div class="etiqueta">Notas</div><div class="tarjeta notas">${esc(c.notas)}</div>` : ''}
     <div class="etiqueta">Facturas y documentos</div>
     ${docs.length ? `<div class="docs">${docs.map((a) => docHTML(a)).join('')}</div>` : `<div class="tarjeta"><p style="margin:0">No hay facturas. Pulsa «Editar» para añadir una.</p></div>`}
     <button class="btn peligro" style="margin-top:28px" data-act="borrar-compra">Eliminar esta compra</button>`;
+}
+
+function ahorroHTML(c) {
+  const po = Number(c.precioOriginal) || 0, p = Number(c.precio) || 0;
+  if (!(po > p)) return '';
+  return `<div class="ahorro">Antes <s>${euro(po)}</s> · Ahorraste ${euro(po - p)} (${Math.round((po - p) / po * 100)} %)</div>`;
+}
+
+/* ---------------- Datos de cada tienda ---------------- */
+function telLimpio(t) { return String(t || '').replace(/[^\d+]/g, ''); }
+function tiendaHTML(nombre) {
+  const t = infoTienda(nombre) || {};
+  const acc = [];
+  if (t.web) acc.push(`<a class="acc" href="${esc(enlaceSeguro(t.web))}" target="_blank" rel="noopener">🌐 Web</a>`);
+  if (t.devoluciones) acc.push(`<a class="acc" href="${esc(enlaceSeguro(t.devoluciones))}" target="_blank" rel="noopener">↩︎ Devoluciones</a>`);
+  if (t.telefono) acc.push(`<a class="acc" href="tel:${esc(telLimpio(t.telefono))}">📞 Llamar</a>`);
+  if (t.email) acc.push(`<a class="acc" href="mailto:${esc(t.email)}">✉️ Correo</a>`);
+  const hay = acc.length || t.cuenta || t.notas;
+  return `<div class="etiqueta">Tienda · ${esc(nombre)}</div>
+  <div class="tarjeta">
+    ${acc.length ? `<div class="acciones">${acc.join('')}</div>` : ''}
+    ${t.telefono ? `<p style="margin:10px 0 0">Teléfono: <b>${esc(t.telefono)}</b></p>` : ''}
+    ${t.email ? `<p style="margin:4px 0 0">Correo de atención: <b>${esc(t.email)}</b></p>` : ''}
+    ${t.cuenta ? `<p style="margin:4px 0 0">Tu cuenta: <b>${esc(t.cuenta)}</b></p>` : ''}
+    ${t.notas ? `<p class="notas" style="margin:8px 0 0">${esc(t.notas)}</p>` : ''}
+    ${hay ? '' : '<p style="margin:0">Guarda aquí la web de devoluciones, el teléfono y el correo de atención de esta tienda para tenerlos a mano.</p>'}
+    <button class="btn sec" data-act="editar-tienda" data-t="${esc(nombre)}">${hay ? 'Editar datos de la tienda' : 'Añadir datos de ' + esc(nombre)}</button>
+  </div>`;
+}
+
+let T = null; // borrador de la tienda
+function abrirTienda(nombre) {
+  T = { ...(infoTienda(nombre) || { nombre }) };
+  $('#tienda .t').textContent = nombre;
+  const campo = (k, t, extra = '', ph = '') => `<label class="campo"><span>${t}</span><input data-tk="${k}" value="${esc(T[k] || '')}" ${extra} placeholder="${esc(ph)}" autocomplete="off"></label>`;
+  $('#tienda-cuerpo').innerHTML = `
+    <div class="grupo">
+      ${campo('web', 'Web de la tienda', 'type="url" inputmode="url"', 'https://…')}
+      ${campo('devoluciones', 'Página de devoluciones y garantías', 'type="url" inputmode="url"', 'https://…')}
+      ${campo('telefono', 'Teléfono de atención al cliente', 'type="tel" inputmode="tel"')}
+      ${campo('email', 'Correo de atención al cliente', 'type="email" inputmode="email" autocapitalize="off"')}
+      ${campo('cuenta', 'Tu correo o usuario de cliente', 'autocapitalize="off"', 'Con el que compras en esta tienda')}
+      <label class="campo"><span>Notas</span><textarea data-tk="notas" placeholder="Plazo de devolución habitual, cómo se tramitan las garantías…">${esc(T.notas || '')}</textarea></label>
+    </div>
+    <div class="nota" style="margin:0 4px">Estos datos sirven para todas las compras de ${esc(nombre)}. No guardes aquí contraseñas.</div>
+    <button class="btn" style="margin-top:16px" data-act="guardar-tienda">Guardar</button>`;
+  $('#tienda').scrollTop = 0;
+  abrirSheet('tienda');
+}
+async function guardarTienda() {
+  if (!T) return;
+  for (const k of ['web', 'devoluciones', 'telefono', 'email', 'cuenta', 'notas']) T[k] = String(T[k] || '').trim();
+  T.actualizado = Date.now();
+  try { await escribir('tiendas', [T]); } catch (e) { alert('No se ha podido guardar: ' + (e && e.message || e)); return; }
+  S.tiendasInfo = S.tiendasInfo.filter((x) => x.nombre !== T.nombre).concat([T]);
+  T = null;
+  cerrarSheet('tienda');
+  toast('Datos de la tienda guardados');
+  if ($('#detalle').classList.contains('open')) pintarDetalle();
+  if (S.tab === 'ajustes') pintar();
+}
+
+/* ---------------- Reclamar garantía o devolver ---------------- */
+let R = null;
+function abrirReclamar() {
+  const c = S.compras.find((x) => x.id === S.detalle); if (!c) return;
+  R = { id: c.id, tipo: estadoD(c) ? 'devolucion' : 'garantia', problema: '', editado: false };
+  pintarReclamar();
+  $('#reclamar').scrollTop = 0;
+  abrirSheet('reclamar');
+}
+function textoReclamo(c, tipo, problema) {
+  const t = infoTienda(c.tienda) || {};
+  const L = ['Hola:', '',
+    tipo === 'garantia' ? 'Quiero solicitar la reparación o sustitución en garantía del siguiente producto:' : 'Quiero devolver el siguiente producto:', ''];
+  L.push('• Producto: ' + c.nombre);
+  if (c.serie) L.push('• Nº de serie / IMEI: ' + c.serie);
+  if (c.fecha) L.push('• Fecha de compra: ' + fLarga(c.fecha));
+  if (c.tienda) L.push('• Comprado en: ' + c.tienda);
+  if (c.pedido) L.push('• Nº de pedido: ' + c.pedido);
+  L.push('• Precio pagado: ' + euro(c.precio));
+  if (tipo === 'garantia') {
+    if (c.garantiaHasta && dias(c.garantiaHasta) >= 0) L.push('• En garantía legal hasta: ' + fLarga(c.garantiaHasta));
+    else if (c.ampliadaHasta) L.push('• En garantía ampliada hasta: ' + fLarga(c.ampliadaHasta));
+  } else if (c.devolucionHasta) L.push('• Plazo de devolución hasta: ' + fLarga(c.devolucionHasta));
+  if (t.cuenta) L.push('• Cuenta de cliente: ' + t.cuenta);
+  L.push('', (tipo === 'garantia' ? 'Problema: ' : 'Motivo de la devolución: ') + (problema.trim() || '[explica aquí qué le pasa]'));
+  L.push('', 'Adjunto la factura de compra.', '', 'Quedo a la espera de vuestras indicaciones. Gracias.', '', 'Un saludo.');
+  return L.join('\n');
+}
+function pintarReclamar() {
+  const c = S.compras.find((x) => x.id === R.id); if (!c) return;
+  const t = infoTienda(c.tienda) || {};
+  const docs = archivosDe(c.id, 'factura');
+  const fin = finGarantia(c);
+  let aviso = '';
+  if (R.tipo === 'garantia' && fin && dias(fin) < 0) aviso = `<div class="aviso-banda"><span>La garantía acabó el ${fLarga(fin)}.</span></div>`;
+  if (R.tipo === 'garantia' && !fin) aviso = `<div class="aviso-banda"><span>Esta compra no tiene fecha de garantía.</span></div>`;
+  if (R.tipo === 'devolucion' && !estadoD(c)) aviso = `<div class="aviso-banda"><span>${c.devolucionHasta ? 'El plazo de devolución acabó el ' + fLarga(c.devolucionHasta) + '.' : 'No has indicado plazo de devolución.'}</span></div>`;
+  if (!R.editado) R.texto = textoReclamo(c, R.tipo, R.problema);
+  $('#reclamar-cuerpo').innerHTML = `
+    <div class="chips" style="margin:0 0 12px">
+      <button type="button" class="chip ${R.tipo === 'garantia' ? 'on' : ''}" data-act="r-tipo" data-v="garantia">Garantía</button>
+      <button type="button" class="chip ${R.tipo === 'devolucion' ? 'on' : ''}" data-act="r-tipo" data-v="devolucion">Devolución</button>
+    </div>
+    ${aviso}
+    <div class="grupo">
+      <label class="campo"><span>${R.tipo === 'garantia' ? '¿Qué le pasa?' : '¿Por qué lo devuelves?'}</span><textarea id="r-problema" placeholder="${R.tipo === 'garantia' ? 'Ej.: no carga, la pantalla parpadea…' : 'Ej.: no es lo que esperaba, talla incorrecta…'}">${esc(R.problema)}</textarea></label>
+      <label class="campo"><span>Mensaje (puedes cambiarlo)</span><textarea id="r-texto" style="min-height:280px">${esc(R.texto)}</textarea></label>
+    </div>
+    <button class="btn" data-act="r-compartir">Compartir ${docs.length ? 'con la factura' : 'mensaje'} (Mail, WhatsApp…)</button>
+    ${t.email ? `<button class="btn sec" data-act="r-correo">Enviar correo a ${esc(t.email)}</button>` : ''}
+    <button class="btn sec" data-act="r-copiar">Copiar el mensaje</button>
+    ${t.devoluciones ? `<a class="btn sec" style="text-decoration:none" href="${esc(enlaceSeguro(t.devoluciones))}" target="_blank" rel="noopener">Abrir la página de devoluciones</a>` : ''}
+    ${t.telefono ? `<a class="btn sec" style="text-decoration:none" href="tel:${esc(telLimpio(t.telefono))}">Llamar a ${esc(c.tienda)}</a>` : ''}
+    <div class="nota" style="margin:10px 4px 0">${docs.length ? 'Con «Compartir» se adjunta la factura automáticamente. Con «Enviar correo» tendrás que adjuntarla tú.' : 'Esta compra no tiene factura guardada. Añádela con «Editar» para poder adjuntarla.'}${t.email || t.devoluciones ? '' : ' Si guardas el correo o la página de devoluciones de la tienda, aparecerán aquí.'}</div>`;
+}
+async function compartirReclamo() {
+  const c = S.compras.find((x) => x.id === R.id); if (!c) return;
+  const text = R.texto;
+  const files = archivosDe(c.id, 'factura').map((a) => new File([a.blob], a.nombre || 'factura', { type: a.blob.type || a.mime }));
+  try {
+    if (files.length && navigator.canShare && navigator.canShare({ files, text })) { await navigator.share({ files, text, title: 'Reclamación: ' + c.nombre }); return; }
+    if (navigator.share) { await navigator.share({ text, title: 'Reclamación: ' + c.nombre }); return; }
+  } catch (e) { if (e && e.name === 'AbortError') return; }
+  copiarTexto(text);
+}
+async function copiarTexto(t) {
+  try { await navigator.clipboard.writeText(t); toast('Mensaje copiado'); }
+  catch (e) { toast('No se ha podido copiar. Selecciona el texto y cópialo.'); }
 }
 
 /* ---------------- Formulario ---------------- */
@@ -563,6 +741,7 @@ function pintarForm() {
       <label class="campo"><span>Producto *</span><input id="f-nombre" data-k="nombre" value="${esc(c.nombre)}" placeholder="Ej.: Auriculares Sony WH-1000XM5" autocomplete="off"></label>
       <label class="campo"><span>Tienda</span><input data-k="tienda" value="${esc(c.tienda)}" list="dl-tiendas" placeholder="Ej.: Amazon, PcComponentes…" autocomplete="off"></label>
       <label class="campo"><span>Precio pagado (€)</span><input data-k="precio" value="${esc(precioTexto(c.precio))}" inputmode="decimal" placeholder="0,00" autocomplete="off"></label>
+      <label class="campo"><span>Precio original sin descuento (€) · opcional</span><input data-k="precioOriginal" value="${esc(precioTexto(c.precioOriginal))}" inputmode="decimal" placeholder="Si estaba rebajado" autocomplete="off"></label>
       <label class="campo"><span>Fecha de compra</span><input type="date" data-k="fecha" value="${esc(c.fecha)}"></label>
     </div>
     <datalist id="dl-tiendas">${['Amazon', 'PcComponentes', 'MediaMarkt', 'El Corte Inglés', 'AliExpress', 'Decathlon', 'IKEA', 'Fnac', 'Apple', 'Zara', 'Leroy Merlin', 'Carrefour', 'Temu', 'Shein'].concat(tiendas()).filter((v, i, a) => a.indexOf(v) === i).map((t) => `<option value="${esc(t)}">`).join('')}</datalist>
@@ -574,6 +753,13 @@ function pintarForm() {
         <div class="chips">${gOps.map(([m, t]) => `<button type="button" class="chip ${c.garantiaMeses === m ? 'on' : ''}" data-act="garantia" data-m="${m}">${t}</button>`).join('')}</div>
         <div class="nota">En España, los productos nuevos comprados desde 2022 tienen 3 años de garantía legal.</div>
       </div>
+      <div class="campo"><span>Garantía ampliada hasta · opcional</span>
+        <input type="date" data-k="ampliadaHasta" value="${esc(c.ampliadaHasta || '')}">
+        <div class="chips">${[[0, 'No tiene'], [1, '+1 año'], [2, '+2 años'], [3, '+3 años']].map(([a, t]) => `<button type="button" class="chip ${c.ampliadaAnios === a ? 'on' : ''}" data-act="ampliada" data-a="${a}">${t}</button>`).join('')}</div>
+        <div class="nota">Garantía del fabricante, seguro o extensión que hayas contratado. «+1 año» se cuenta desde el final de la garantía legal.</div>
+      </div>
+      <label class="campo"><span>¿Quién da la garantía ampliada?</span><input data-k="ampliadaQuien" value="${esc(c.ampliadaQuien || '')}" placeholder="Ej.: fabricante, seguro de la tienda…" autocomplete="off"></label>
+      <label class="campo"><span>Nº de serie / IMEI</span><input data-k="serie" value="${esc(c.serie || '')}" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Lo suelen pedir al reclamar"></label>
       <div class="campo"><span>Devolución hasta</span>
         <input type="date" data-k="devolucionHasta" value="${esc(c.devolucionHasta || '')}">
         <div class="chips">${dOps.map(([n, t]) => `<button type="button" class="chip ${c.devolucionDias === n ? 'on' : ''}" data-act="devolucion" data-n="${n}">${t}</button>`).join('')}</div>
@@ -608,10 +794,17 @@ function cambioCampo(e) {
   if (k === 'fecha' && v) {
     if (F.c.garantiaMeses) F.c.garantiaHasta = masMeses(v, F.c.garantiaMeses);
     if (F.c.devolucionDias) F.c.devolucionHasta = masDias(v, F.c.devolucionDias);
+    recalcularAmpliada();
     if (e.type === 'change') pintarForm();
   }
-  if (k === 'garantiaHasta') F.c.garantiaMeses = null;
+  if (k === 'garantiaHasta') { F.c.garantiaMeses = null; recalcularAmpliada(); }
+  if (k === 'ampliadaHasta') F.c.ampliadaAnios = null;
   if (k === 'devolucionHasta') F.c.devolucionDias = null;
+}
+
+function recalcularAmpliada() {
+  const a = F.c.ampliadaAnios;
+  if (a) F.c.ampliadaHasta = masMeses(F.c.garantiaHasta || F.c.fecha || hoy(), 12 * a);
 }
 
 async function reducir(file, max, q) {
@@ -666,6 +859,9 @@ async function guardarForm() {
   c.tienda = String(c.tienda || '').trim();
   c.categoria = String(c.categoria || '').trim();
   c.precio = leerPrecio(c.precio);
+  c.precioOriginal = String(c.precioOriginal ?? '').trim() === '' ? null : leerPrecio(c.precioOriginal);
+  c.serie = String(c.serie || '').trim();
+  c.ampliadaQuien = String(c.ampliadaQuien || '').trim();
   c.actualizado = Date.now();
   try {
     await escribir('compras', [c]);
@@ -737,7 +933,7 @@ async function prepararCopia() {
   try {
     const archivos = [];
     for (const a of S.archivos) archivos.push({ ...a, blob: await aDataURL(a.blob), mini: a.mini ? await aDataURL(a.mini) : null });
-    const datos = { app: 'compras', version: VERSION, fecha: new Date().toISOString(), compras: S.compras, archivos };
+    const datos = { app: 'compras', version: VERSION, fecha: new Date().toISOString(), compras: S.compras, tiendas: S.tiendasInfo, archivos };
     const blob = new Blob([JSON.stringify(datos)], { type: 'application/json' });
     S.copia = { blob, nombre: 'compras-copia-' + hoy() + '.json' };
     toast('Copia lista. Pulsa «Guardar la copia».');
@@ -761,6 +957,7 @@ async function importarCopia(file) {
     const archivos = [];
     for (const a of datos.archivos || []) archivos.push({ ...a, blob: await deDataURL(a.blob), mini: await deDataURL(a.mini) });
     await escribir('compras', datos.compras);
+    if (Array.isArray(datos.tiendas)) await escribir('tiendas', datos.tiendas.filter((t) => t && t.nombre));
     await escribir('archivos', archivos.filter((a) => a.blob));
     await cargar();
     toast('Copia importada: ' + plural(datos.compras.length, 'compra', 'compras'));
@@ -781,10 +978,11 @@ async function programarAvisos() {
   const ahora = Date.now(), limite = ahora + 3 * DIA - 5 * 60000;
   const eventos = [];
   for (const c of S.compras) {
-    if (c.garantiaHasta) for (const n of [30, 7]) eventos.push({
-      k: `g|${c.id}|${c.garantiaHasta}|${n}`, t: a10(masDias(c.garantiaHasta, -n)),
+    const fin = finGarantia(c);
+    if (fin) for (const n of [30, 7]) eventos.push({
+      k: `g|${c.id}|${fin}|${n}`, t: a10(masDias(fin, -n)),
       title: 'La garantía acaba en ' + n + ' días',
-      message: `${c.nombre}${c.tienda ? ' (' + c.tienda + ')' : ''}: garantía hasta el ${fLarga(c.garantiaHasta)}.`
+      message: `${c.nombre}${c.tienda ? ' (' + c.tienda + ')' : ''}: garantía hasta el ${fLarga(fin)}.`
     });
     if (c.devolucionHasta) eventos.push({
       k: `d|${c.id}|${c.devolucionHasta}|3`, t: a10(masDias(c.devolucionHasta, -3)),
@@ -814,9 +1012,9 @@ function activarAvisos() {
 /* ---------------- Eventos ---------------- */
 document.addEventListener('click', async (e) => {
   const tabBtn = e.target.closest('[data-tab]');
-  if (tabBtn) { S.tab = tabBtn.dataset.tab; window.scrollTo(0, 0); pintar(); return; }
+  if (tabBtn) { S.tab = tabBtn.dataset.tab; $('#main').scrollTop = 0; pintar(); return; }
   const ir = e.target.closest('[data-tab-ir]');
-  if (ir) { S.tab = ir.dataset.tabIr; window.scrollTo(0, 0); pintar(); return; }
+  if (ir) { S.tab = ir.dataset.tabIr; $('#main').scrollTop = 0; pintar(); return; }
   const el = e.target.closest('[data-act]'); if (!el) return;
   const act = el.dataset.act;
   if (act === 'quitar-archivo') { e.stopPropagation(); quitarArchivo(el.dataset.aid); return; }
@@ -827,10 +1025,29 @@ document.addEventListener('click', async (e) => {
     case 'editar': abrirForm(S.detalle); break;
     case 'borrar-compra': borrarCompra(); break;
     case 'cancelar-form': cerrarForm(); break;
+    case 'editar-tienda': abrirTienda(el.dataset.t); break;
+    case 'cancelar-tienda': T = null; cerrarSheet('tienda'); break;
+    case 'guardar-tienda': guardarTienda(); break;
+    case 'reclamar': abrirReclamar(); break;
+    case 'cerrar-reclamar': R = null; cerrarSheet('reclamar'); break;
+    case 'r-tipo': R.tipo = el.dataset.v; R.editado = false; pintarReclamar(); break;
+    case 'r-compartir': compartirReclamo(); break;
+    case 'r-copiar': copiarTexto(R.texto); break;
+    case 'r-correo': {
+      const c = S.compras.find((x) => x.id === R.id), t = infoTienda(c.tienda) || {};
+      const asunto = (R.tipo === 'garantia' ? 'Garantía: ' : 'Devolución: ') + c.nombre + (c.pedido ? ' (pedido ' + c.pedido + ')' : '');
+      location.href = 'mailto:' + encodeURIComponent(t.email || '') + '?subject=' + encodeURIComponent(asunto) + '&body=' + encodeURIComponent(R.texto);
+      break;
+    }
     case 'guardar-form': guardarForm(); break;
     case 'garantia': {
       const m = Number(el.dataset.m); F.c.garantiaMeses = m;
-      F.c.garantiaHasta = m ? masMeses(F.c.fecha || hoy(), m) : ''; pintarForm(); break;
+      F.c.garantiaHasta = m ? masMeses(F.c.fecha || hoy(), m) : ''; recalcularAmpliada(); pintarForm(); break;
+    }
+    case 'ampliada': {
+      const a = Number(el.dataset.a); F.c.ampliadaAnios = a;
+      if (a) recalcularAmpliada(); else { F.c.ampliadaHasta = ''; F.c.ampliadaQuien = ''; }
+      pintarForm(); break;
     }
     case 'devolucion': {
       const n = Number(el.dataset.n); F.c.devolucionDias = n;
@@ -857,6 +1074,13 @@ document.addEventListener('click', async (e) => {
 
 document.addEventListener('input', (e) => {
   if (e.target.id === 'q') { S.q = e.target.value; pintarResultados(); return; }
+  if (e.target.dataset.tk && T) { T[e.target.dataset.tk] = e.target.value; return; }
+  if (e.target.id === 'r-problema' && R) {
+    R.problema = e.target.value;
+    if (!R.editado) { const c = S.compras.find((x) => x.id === R.id); R.texto = textoReclamo(c, R.tipo, R.problema); $('#r-texto').value = R.texto; }
+    return;
+  }
+  if (e.target.id === 'r-texto' && R) { R.texto = e.target.value; R.editado = true; return; }
   if (e.target.closest('#form')) cambioCampo(e);
 });
 document.addEventListener('change', (e) => {
@@ -869,9 +1093,11 @@ document.addEventListener('change', (e) => {
 });
 
 /* ---------------- Arranque ---------------- */
+// Sin zoom con dos dedos (iOS ignora user-scalable en algunos casos).
+['gesturestart', 'gesturechange'].forEach((ev) => document.addEventListener(ev, (e) => e.preventDefault(), { passive: false }));
 async function cargar() {
   S.urls.forEach((u) => URL.revokeObjectURL(u)); S.urls.clear();
-  [S.compras, S.archivos] = await Promise.all([todos('compras'), todos('archivos')]);
+  [S.compras, S.archivos, S.tiendasInfo] = await Promise.all([todos('compras'), todos('archivos'), todos('tiendas')]);
 }
 (async function iniciar() {
   try { await cargar(); }

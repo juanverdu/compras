@@ -1,5 +1,5 @@
 // Cambia este número en cada versión (el mismo que VERSION en index.html).
-const VERSION = '1.0.0';
+const VERSION = '1.1.0';
 const CACHE = 'compras-' + VERSION;
 const FILES = ['./', 'index.html', 'manifest.webmanifest', 'icon-180.png', 'icon-192.png', 'icon-512.png'];
 
